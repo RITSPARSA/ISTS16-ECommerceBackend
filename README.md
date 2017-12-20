@@ -6,7 +6,7 @@ Backend of ecommerce website
 ## POST /login
 Login with a users credentials
 
-### PARAMS
+### Parameters
 ```
 {
     username: [string],
@@ -14,10 +14,25 @@ Login with a users credentials
 }
 ```
 
+### Response
+#### Status Code: 200
+```
+{
+    balance: [int]
+}
+```
+#### Status Code: 400+
+```
+{
+    error: [string]
+}
+```
+---
+
 ## POST /get-balance
 Get the balance for the users account
 
-### PARAMS
+### Parameters
 ```
 {
     token: [string],
@@ -25,23 +40,24 @@ Get the balance for the users account
 ```
 
 ### Response
-#### Success (200)
+#### Status Code: 200
 ```
 {
     balance: [int]
 }
 ```
-#### Error (400+)
+#### Status Code: 400+
 ```
 {
     error: [string]
 }
 ```
+---
 
 ## POST /buy
 Buy a particular item from the store
 
-### PARAMS
+### Parameters
 ```
 {
     token: [string],
@@ -49,20 +65,50 @@ Buy a particular item from the store
 }
 ```
 
+### Response
+#### Status Code: 200
+```
+{
+    transaction_id: [int]
+}
+```
+#### Status Code: 400+
+```
+{
+    error: [string]
+}
+```
+---
+
 ## POST /expire-session
 Expire a session for a user
 
-### PARAMS
+### Parameters
 ```
 {
     token: [string],
 }
 ```
 
+### Response
+#### Status Code: 200
+```
+{
+    success: [string]
+}
+```
+#### Status Code: 400+
+```
+{
+    error: [string]
+}
+```
+---
+
 ## POST /update-session
 Set a session for a user after a succesful log in. Need their username/password and the token to attach to their account
 
-### PARAMS
+### Parameters
 ```
 {
     username: [string],
@@ -71,12 +117,42 @@ Set a session for a user after a succesful log in. Need their username/password 
 }
 ```
 
+### Response
+#### Status Code: 200
+```
+{
+    success: [string]
+}
+```
+#### Status Code: 400+
+```
+{
+    error: [string]
+}
+```
+---
+
 ## POST /transactions
 Return a list of the transactions made on their account
 
-### PARAMS
+### Parameters
 ```
 {
     token: [string]
 }
 ```
+
+### Response
+#### Status Code: 200
+```
+{
+    transactions: [array[strings]]
+}
+```
+#### Status Code: 400+
+```
+{
+    error: [string]
+}
+```
+---
