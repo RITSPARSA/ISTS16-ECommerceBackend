@@ -15,13 +15,13 @@ Login with a users credentials
 ```
 
 ### Response
-** Status Code: 200
+**Status Code: 200**
 ```
 {
     balance: [int]
 }
 ```
-** Status Code: 400+
+**Status Code: 400+**
 ```
 {
     error: [string]
@@ -40,13 +40,13 @@ Get the balance for the users account
 ```
 
 ### Response
-** Status Code: 200
+**Status Code: 200**
 ```
 {
     balance: [int]
 }
 ```
-** Status Code: 400+
+**Status Code: 400+**
 ```
 {
     error: [string]
@@ -66,13 +66,13 @@ Buy a particular item from the store
 ```
 
 ### Response
-** Status Code: 200
+**Status Code: 200**
 ```
 {
     transaction_id: [int]
 }
 ```
-** Status Code: 400+
+**Status Code: 400+**
 ```
 {
     error: [string]
@@ -91,13 +91,13 @@ Expire a session for a user
 ```
 
 ### Response
-** Status Code: 200
+**Status Code: 200**
 ```
 {
     success: [string]
 }
 ```
-** Status Code: 400+
+**Status Code: 400+**
 ```
 {
     error: [string]
@@ -118,13 +118,13 @@ Set a session for a user after a succesful log in. Need their username/password 
 ```
 
 ### Response
-** Status Code: 200
+**Status Code: 200**
 ```
 {
     success: [string]
 }
 ```
-** Status Code: 400+
+**Status Code: 400+**
 ```
 {
     error: [string]
@@ -143,13 +143,13 @@ Return a list of the transactions made on their account
 ```
 
 ### Response
-** Status Code: 200
+**Status Code: 200**
 ```
 {
     transactions: [array[strings]]
 }
 ```
-** Status Code: 400+
+**Status Code: 400+**
 ```
 {
     error: [string]
