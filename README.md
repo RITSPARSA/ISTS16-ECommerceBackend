@@ -4,13 +4,14 @@ Backend of ecommerce website
 # API
 
 ## POST /login
-Login with a users credentials
+Login with a users credentials, send token with credentials, will be attached to the account if successfully logged in
 
 ### Parameters
 ```
 {
     username: [string],
     password: [string],
+    token: [string],
 }
 ```
 
@@ -18,7 +19,7 @@ Login with a users credentials
 **Status Code: 200**
 ```
 {
-    balance: [int]
+    verified: [boolean]
 }
 ```
 **Status Code: 400+**
@@ -106,14 +107,13 @@ Expire a session for a user
 ---
 
 ## POST /update-session
-Set a session for a user after a succesful log in. Need their username/password and the token to attach to their account
+Update a users session from and old token to a new one
 
 ### Parameters
 ```
 {
-    username: [string],
-    password: [string],
-    token: [string],
+    old_token: [string],
+    new_token: [string],
 }
 ```
 
