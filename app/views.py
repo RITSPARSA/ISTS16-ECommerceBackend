@@ -17,7 +17,22 @@ def login():
 
     :returns result: json dict containing either a success or and error
     """
-    pass
+    data = request.get_json()
+    if data is None:
+        data = request.form
+
+    username = data['username']
+    password = data['password']
+
+    user = Users.query.filter_by(username=username, password=password)
+    print user
+
+    result = {
+        'status': 200,
+        'success': "Successfully logged in"
+    }
+    return jsonify(result)
+
 
 @app.route('/get-balance', methods=['POST'])
 def get_balance():

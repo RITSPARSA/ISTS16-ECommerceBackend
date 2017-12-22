@@ -19,7 +19,7 @@ Login with a users credentials, send token with credentials, will be attached to
 **Status Code: 200**
 ```
 {
-    verified: [boolean]
+    success: [string]
 }
 ```
 **Status Code: 400+**
