@@ -23,6 +23,7 @@ def login():
     data = request.get_json()
     if data is None:
         data = request.form
+    # ADD CHECK IF NO DATA
 
     username = data['username']
     password = data['password']
@@ -47,7 +48,25 @@ def get_balance():
 
     :returns result: json dict containing either the account balance or an error
     """
-    pass
+    result = dict()
+    data = request.get_json()
+    if data is None:
+        data = request.form
+
+    token = data['token']
+    session = Session.query.filter_by(token=token).first()
+    if session is None:
+        result['status'] = 403
+        result['error'] = 'Invalid session'
+    else:
+        uuid = session.uuid
+        user = Users.query.filter_by(uuid=uuid).first()
+        balance = user.balance
+        result['status'] = 200
+        result['balance'] = balance
+
+    return jsonify(result)
+
 
 @APP.route('/buy', methods=['POST'])
 def buy():

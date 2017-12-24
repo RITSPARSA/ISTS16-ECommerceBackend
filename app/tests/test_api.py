@@ -31,14 +31,23 @@ class ApiTestCases(unittest.TestCase):
         data = dict(username=username, password=password, token=token)
 
         return self.app.post('/login', data=data)
-
+    
     def test_login(self):
         """
         Test the login functionality of our app
         """
         result = self.login('testuser', 'testpass')
-        print result
         assert result.status_code == 200
+
+    def test_balance(self):
+        """
+        Test if we can get the balance of a user
+        """
+        data = dict(token='testusertestpass')
+        result = self.app.post('/get-balance', data=data)
+        assert result.status_code == 200
+        assert 'balance' in result.data
+
 
 if __name__ == '__main__':
     unittest.main()
