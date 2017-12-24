@@ -1,12 +1,14 @@
 """
     Entry point for API calls
 """
-from . import APP as app
+import time
+from flask import request, jsonify
+from . import APP, DB
 from .models.session import Session
 from .models.users import Users
-from flask import request, jsonify, render_template
 
-@app.route('/login', methods=['POST'])
+
+@APP.route('/login', methods=['POST'])
 def login():
     """
     Verifies if a the submitted credentials are correct
@@ -17,6 +19,7 @@ def login():
 
     :returns result: json dict containing either a success or and error
     """
+    result = dict()
     data = request.get_json()
     if data is None:
         data = request.form
@@ -24,17 +27,18 @@ def login():
     username = data['username']
     password = data['password']
 
-    user = Users.query.filter_by(username=username, password=password)
-    print user
+    user = Users.query.filter_by(username=username, password=password).first()
+    if user is None:
+        result['status'] = 403
+        result['error'] = 'Username or password invalid'
+    else:
+        new_session(user.uuid, data['token'], request.remote_addr)
+        result['status'] = 200
+        result['success'] = "Successfully logged in"
 
-    result = {
-        'status': 200,
-        'success': "Successfully logged in"
-    }
     return jsonify(result)
 
-
-@app.route('/get-balance', methods=['POST'])
+@APP.route('/get-balance', methods=['POST'])
 def get_balance():
     """
     Gets the balance of a team
@@ -45,7 +49,7 @@ def get_balance():
     """
     pass
 
-@app.route('/buy', methods=['POST'])
+@APP.route('/buy', methods=['POST'])
 def buy():
     """
     Buys a item from the white team store
@@ -57,7 +61,7 @@ def buy():
     """
     pass
 
-@app.route('/expire-session', methods=['POST'])
+@APP.route('/expire-session', methods=['POST'])
 def expire_session():
     """
     Set a teams auth token to NULL, essentially expiring their session
@@ -68,7 +72,7 @@ def expire_session():
     """
     pass
 
-@app.route('/update-session', methods=['POST'])
+@APP.route('/update-session', methods=['POST'])
 def update_session():
     """
     Updates a teams auth token from an old one to a new one.
@@ -80,7 +84,7 @@ def update_session():
     """
     pass
 
-@app.route('/transactions', methods=['POST'])
+@APP.route('/transactions', methods=['POST'])
 def transactions():
     """
     Get a list of transactions made by the account
@@ -90,3 +94,21 @@ def transactions():
     :returns result: json dict containing either an array of the transactions or an error.
     """
     pass
+
+
+## HELPER FUNCTIONS
+
+def new_session(uuid, token, src):
+    """
+    Enters a new session for a user
+
+    :param uuid: the users id
+    :param token: the token to attach to their session
+    :param src: the source ip of the request
+    """
+    now = time.time()
+    session = Session.query.filter_by(uuid=uuid).first()
+    session.token = token
+    session.time = now
+    session.src = src
+    DB.session.commit()

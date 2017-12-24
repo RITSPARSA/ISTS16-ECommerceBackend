@@ -1,8 +1,6 @@
-import os
 import unittest
-import tempfile
-from app import APP
-#from .. import APP
+from app import APP, views
+
 
 class ApiTestCases(unittest.TestCase):
     """
