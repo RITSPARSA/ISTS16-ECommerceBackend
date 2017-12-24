@@ -48,6 +48,17 @@ class ApiTestCases(unittest.TestCase):
         assert result.status_code == 200
         assert 'balance' in result.data
 
+    def test_expire_session(self):
+        """
+        Test if expiring a session functions correctly
+        """
+        self.login('testuser', 'testpass')
+        data = dict(token='testusertestpass')
+        result = self.app.post('/expire-session', data=data)
+        assert result.status_code == 200
+        result = self.app.post('/get-balance', data=data)
+        assert result.status_code == 403
+
 
 if __name__ == '__main__':
     unittest.main()

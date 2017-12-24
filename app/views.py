@@ -2,10 +2,11 @@
     Entry point for API calls
 """
 import time
-from flask import request, jsonify
+from flask import request, jsonify, abort
 from . import APP, DB
 from .models.session import Session
 from .models.users import Users
+from . import errors
 
 
 @APP.route('/login', methods=['POST'])
@@ -30,8 +31,7 @@ def login():
 
     user = Users.query.filter_by(username=username, password=password).first()
     if user is None:
-        result['status'] = 403
-        result['error'] = 'Username or password invalid'
+        raise errors.AuthError('Invalid username or password')
     else:
         new_session(user.uuid, data['token'], request.remote_addr)
         result['status'] = 200
@@ -56,8 +56,7 @@ def get_balance():
     token = data['token']
     session = Session.query.filter_by(token=token).first()
     if session is None:
-        result['status'] = 403
-        result['error'] = 'Invalid session'
+        raise errors.AuthError('Invalid session')
     else:
         uuid = session.uuid
         user = Users.query.filter_by(uuid=uuid).first()
@@ -89,7 +88,22 @@ def expire_session():
 
     :return result: json dict containing either a success or an error
     """
-    pass
+    result = dict()
+    data = request.get_json()
+    if data is None:
+        data = request.form
+
+    token = data['token']
+    session = Session.query.filter_by(token=token).first()
+    if session is None:
+        raise errors.AuthError('Invalid session')
+    else:
+        session.token = None
+        DB.session.commit()
+        result['status'] = 200
+        result['success'] = 'Token expired'
+
+    return jsonify(result)
 
 @APP.route('/update-session', methods=['POST'])
 def update_session():
