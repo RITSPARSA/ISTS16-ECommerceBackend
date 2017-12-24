@@ -6,6 +6,8 @@ from flask import request, jsonify, abort
 from . import APP, DB
 from .models.session import Session
 from .models.users import Users
+from .models.transaction import Transaction
+from .models.item import Item
 from . import errors
 
 
@@ -34,7 +36,6 @@ def login():
         raise errors.AuthError('Invalid username or password')
     else:
         new_session(user.uuid, data['token'], request.remote_addr)
-        result['status'] = 200
         result['success'] = "Successfully logged in"
 
     return jsonify(result)
@@ -61,7 +62,6 @@ def get_balance():
         uuid = session.uuid
         user = Users.query.filter_by(uuid=uuid).first()
         balance = user.balance
-        result['status'] = 200
         result['balance'] = balance
 
     return jsonify(result)
@@ -100,7 +100,6 @@ def expire_session():
     else:
         session.token = None
         DB.session.commit()
-        result['status'] = 200
         result['success'] = 'Token expired'
 
     return jsonify(result)
@@ -115,7 +114,22 @@ def update_session():
 
     :returns result: json dict containg either a success or a error
     """
-    pass
+    result = dict()
+    data = request.get_json()
+    if data is None:
+        data = request.form
+
+    old_token = data['old_token']
+    new_token = data['new_token']
+    session = Session.query.filter_by(token=old_token).first()
+    if session is None:
+        raise errors.AuthError('Invalid session')
+    else:
+        session.token = new_token
+        DB.session.commit()
+        result['success'] = 'Token updated'
+
+    return jsonify(result)
 
 @APP.route('/transactions', methods=['POST'])
 def transactions():

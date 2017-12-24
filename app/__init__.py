@@ -21,3 +21,5 @@ except Exception as e:
     print e
     print "ERROR: Could not connect to database"
     sys.exit()
+
+from .views import *
