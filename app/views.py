@@ -92,13 +92,11 @@ def buy():
     user = Users.query.filter_by(uuid=uuid).first()
     item = Item.query.filter_by(uuid=item_id).first()
     if item is None:
-        # make item not found error
-        pass
+        raise errors.TransactionError('Item not be found', status_code=404)
 
     balance = user.balance
     if balance < item.price:
-        # make insufficient funds error
-        pass
+        raise errors.TransactionError('Insufficient funds')
 
     user.balance -= item.price
     # create our tranasction
