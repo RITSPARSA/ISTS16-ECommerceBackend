@@ -98,6 +98,7 @@ class ApiTestCases(unittest.TestCase):
         result = self.app.post('/get-balance', data=data)
         assert result.status_code == 200
 
+    @unittest.skip("demonstrating skipping")
     def test_buying_item(self):
         """
         Test if we can buy an item from the store
@@ -108,7 +109,6 @@ class ApiTestCases(unittest.TestCase):
         current_balance = self.get_balance(token)
 
         result = self.app.post('/buy', data=data)
-        print result.data
 
         # Verify we get the transaction id
         assert result.status_code == 200
@@ -118,6 +118,16 @@ class ApiTestCases(unittest.TestCase):
         new_balance = self.get_balance(token)
         assert (current_balance - item_price) == new_balance
 
+    def test_transactions(self):
+        """Test if we can get a list of transactions for a user"""
+        token = self.login('testuser', 'testpass')
+        data = dict(token=token)
+        result = self.app.post('/transactions', data=data)
+        print result.data
+        assert result.status_code == 200
+        assert 'transactions' in result.data
+        for tx in result.data['transactions']:
+            print tx
 
 if __name__ == '__main__':
     unittest.main()

@@ -2,7 +2,8 @@
     Entry point for API calls
 """
 import time
-from flask import request, jsonify
+from flask import request, jsonify, abort
+from sqlalchemy import or_
 from . import APP, DB
 from .models.session import Session
 from .models.users import Users
@@ -26,7 +27,8 @@ def login():
     data = request.get_json()
     if data is None:
         data = request.form
-    # ADD CHECK IF NO DATA
+        if data is None:
+            abort(400)
 
     username = data['username']
     password = data['password']
@@ -34,9 +36,9 @@ def login():
     user = Users.query.filter_by(username=username, password=password).first()
     if user is None:
         raise errors.AuthError('Invalid username or password')
-    else:
-        new_session(user.uuid, data['token'], request.remote_addr)
-        result['success'] = "Successfully logged in"
+
+    new_session(user.uuid, data['token'], request.remote_addr)
+    result['success'] = "Successfully logged in"
 
     return jsonify(result)
 
@@ -53,16 +55,18 @@ def get_balance():
     data = request.get_json()
     if data is None:
         data = request.form
+        if data is None:
+            abort(400)
 
     token = data['token']
     session = Session.query.filter_by(token=token).first()
     if session is None:
         raise errors.AuthError('Invalid session')
-    else:
-        uuid = session.uuid
-        user = Users.query.filter_by(uuid=uuid).first()
-        balance = user.balance
-        result['balance'] = balance
+
+    uuid = session.uuid
+    user = Users.query.filter_by(uuid=uuid).first()
+    balance = user.balance
+    result['balance'] = balance
 
     return jsonify(result)
 
@@ -81,6 +85,8 @@ def buy():
     data = request.get_json()
     if data is None:
         data = request.form
+        if data is None:
+            abort(400)
 
     token = data['token']
     item_id = data['item_id']
@@ -122,15 +128,17 @@ def expire_session():
     data = request.get_json()
     if data is None:
         data = request.form
+        if data is None:
+            abort(400)
 
     token = data['token']
     session = Session.query.filter_by(token=token).first()
     if session is None:
         raise errors.AuthError('Invalid session')
-    else:
-        session.token = None
-        DB.session.commit()
-        result['success'] = 'Token expired'
+
+    session.token = None
+    DB.session.commit()
+    result['success'] = 'Token expired'
 
     return jsonify(result)
 
@@ -148,16 +156,18 @@ def update_session():
     data = request.get_json()
     if data is None:
         data = request.form
+        if data is None:
+            abort(400)
 
     old_token = data['old_token']
     new_token = data['new_token']
     session = Session.query.filter_by(token=old_token).first()
     if session is None:
         raise errors.AuthError('Invalid session')
-    else:
-        session.token = new_token
-        DB.session.commit()
-        result['success'] = 'Token updated'
+
+    session.token = new_token
+    DB.session.commit()
+    result['success'] = 'Token updated'
 
     return jsonify(result)
 
@@ -170,7 +180,25 @@ def transactions():
 
     :returns result: json dict containing either an array of the transactions or an error.
     """
-    pass
+    result = dict()
+    result['transactions'] = []
+    data = request.get_json()
+    if data is None:
+        data = request.form
+        if data is None:
+            abort(400)
+
+    token = data['token']
+    session = Session.query.filter_by(token=token).first()
+    if session is None:
+        raise errors.AuthError('Invalid session')
+
+    user = Users.query.filter_by(uuid=session.uuid).first()
+    txs = Transaction.query.filter(or_(Transaction.src == user.uuid, Transaction.dst == user.uuid))
+    for t in txs:
+        result['transactions'].append(str(t.__dict__))
+
+    return jsonify(result)
 
 ##
 ## HELPER FUNCTIONS
@@ -201,7 +229,6 @@ def get_item_price(item_id):
     """
     item = Item.query.filter_by(uuid=item_id).first()
     if item is None:
-        # make item not found error
-        pass
-    
+        raise errors.TransactionError("Item not found", status_code=404)
+
     return item.price
