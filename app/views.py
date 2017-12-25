@@ -2,7 +2,7 @@
     Entry point for API calls
 """
 import time
-from flask import request, jsonify, abort
+from flask import request, jsonify
 from . import APP, DB
 from .models.session import Session
 from .models.users import Users
@@ -77,7 +77,39 @@ def buy():
 
     :return result: json dict containg either the id of the transaction or an error
     """
-    pass
+    result = dict()
+    data = request.get_json()
+    if data is None:
+        data = request.form
+
+    token = data['token']
+    item_id = data['item_id']
+    session = Session.query.filter_by(token=token).first()
+    if session is None:
+        raise errors.AuthError('Invalid session')
+
+    uuid = session.uuid
+    user = Users.query.filter_by(uuid=uuid).first()
+    item = Item.query.filter_by(uuid=item_id).first()
+    if item is None:
+        # make item not found error
+        pass
+
+    balance = user.balance
+    if balance < item.price:
+        # make insufficient funds error
+        pass
+
+    user.balance -= item.price
+    # create our tranasction
+    now = time.time()
+    # dst = 0 because 0 is white team
+    tx = Transaction(time=now, src=user.uuid, dst=0, desc="bought item from shop", amount=item.price)
+    DB.session.add(tx)
+    DB.session.commit()
+    result['transaction_id'] = tx.uuid
+
+    return jsonify(result)
 
 @APP.route('/expire-session', methods=['POST'])
 def expire_session():
@@ -142,8 +174,9 @@ def transactions():
     """
     pass
 
-
+##
 ## HELPER FUNCTIONS
+##
 
 def new_session(uuid, token, src):
     """
@@ -159,3 +192,18 @@ def new_session(uuid, token, src):
     session.time = now
     session.src = src
     DB.session.commit()
+
+def get_item_price(item_id):
+    """
+    Returns the price of an item from the database
+
+    :param item_id: id of the item
+
+    :returns price: price of the item
+    """
+    item = Item.query.filter_by(uuid=item_id).first()
+    if item is None:
+        # make item not found error
+        pass
+    
+    return item.price

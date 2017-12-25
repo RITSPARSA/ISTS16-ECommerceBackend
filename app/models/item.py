@@ -15,7 +15,6 @@ class Item(DB.Model):
     uuid = DB.Column(DB.Integer, primary_key=True, autoincrement=True)
     price = DB.Column(DB.Integer)
 
-
     def __init__(self, price=None):
         self.price = price
 
