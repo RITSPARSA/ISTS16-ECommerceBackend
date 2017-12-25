@@ -4,38 +4,50 @@
 from flask import jsonify
 from . import APP
 
-class AuthError(Exception):
-    """Custom error class for invalid credentials"""
+
+class APIErrors(Exception):
+    """
+    Custom class for our API errors
+
+    :param message: the message to send back to the user
+    :param status_code: the specific status code to display
+    """
     def __init__(self, message=None, status_code=403):
         Exception.__init__(self)
         self.message = message
         self.status_code = status_code
 
     def to_dict(self):
+        """Converts our error into a dict to send back"""
         rv = dict()
         rv['error'] = self.message
         return rv
 
-class TransactionError(Exception):
-    """Custom error class for when buying things"""
+
+class AuthError(APIErrors):
+    """Errors with invalid credentials/sessions"""
     def __init__(self, message=None, status_code=403):
-        Exception.__init__(self)
-        self.message = message
-        self.status_code = status_code
+        APIErrors.__init__(self, message, status_code)
 
-    def to_dict(self):
-        rv = dict()
-        rv['error'] = self.message
-        return rv
+class TransactionError(APIErrors):
+    """Errors with buying/transfering"""
+    def __init__(self, message=None, status_code=403):
+        APIErrors.__init__(self, message, status_code)
 
-@APP.errorhandler(AuthError)
-def handle_authentication_error(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
-    return response
+class TeamError(APIErrors):
+    """IErrors with team accounts"""
+    def __init__(self, message=None, status_code=403):
+        APIErrors.__init__(self, message, status_code)
 
-@APP.errorhandler(TransactionError)
-def handle_transaction_error(error):
+class RequestError(APIErrors):
+    """Errros with missing or malformed request parameters"""
+    def __init__(self, message=None, status_code=403):
+        APIErrors.__init__(self, message, status_code)
+
+
+@APP.errorhandler(APIErrors)
+def handle_api_error(error):
+    """flask error handler for our custom errors"""
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response

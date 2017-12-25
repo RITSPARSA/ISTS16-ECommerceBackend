@@ -10,7 +10,7 @@ from .models.users import Users
 from .models.transaction import Transaction
 from .models.item import Item
 from . import errors
-from .util import new_session
+from .util import new_session, validate_request
 
 
 @APP.route('/login', methods=['POST'])
@@ -30,6 +30,10 @@ def login():
         data = request.form
         if data is None:
             abort(400)
+
+    # make sure we have all the correct parameters
+    params = ['username', 'token', 'password']
+    validate_request(params, data)
 
     username = data['username']
     password = data['password']
@@ -59,6 +63,10 @@ def get_balance():
         data = request.form
         if data is None:
             abort(400)
+
+    # make sure we have all the correct parameters
+    params = ['token']
+    validate_request(params, data)
 
     token = data['token']
     session = Session.query.filter_by(token=token).first()
@@ -90,6 +98,10 @@ def buy():
         if data is None:
             abort(400)
 
+    # make sure we have all the correct parameters
+    params = ['token', 'item_id']
+    validate_request(params, data)
+
     token = data['token']
     item_id = data['item_id']
     session = Session.query.filter_by(token=token).first()
@@ -109,7 +121,8 @@ def buy():
     # create our tranasction
     now = time.time()
     # dst = 0 because 0 is white team
-    tx = Transaction(time=now, src=user.uuid, dst=0, desc="bought item from shop", amount=item.price)
+    tx = Transaction(time=now, src=user.uuid, dst=0,
+                     desc="bought item from shop", amount=item.price)
     DB.session.add(tx)
     DB.session.commit()
     result['transaction_id'] = tx.uuid
@@ -131,6 +144,10 @@ def expire_session():
         data = request.form
         if data is None:
             abort(400)
+
+    # make sure we have all the correct parameters
+    params = ['token']
+    validate_request(params, data)
 
     token = data['token']
     session = Session.query.filter_by(token=token).first()
@@ -159,6 +176,10 @@ def update_session():
         data = request.form
         if data is None:
             abort(400)
+
+    # make sure we have all the correct parameters
+    params = ['old_token', 'new_token']
+    validate_request(params, data)
 
     old_token = data['old_token']
     new_token = data['new_token']
@@ -189,6 +210,10 @@ def transactions():
         if data is None:
             abort(400)
 
+    # make sure we have all the correct parameters
+    params = ['token']
+    validate_request(params, data)
+
     token = data['token']
     session = Session.query.filter_by(token=token).first()
     if session is None:
@@ -199,4 +224,56 @@ def transactions():
     for t in txs:
         result['transactions'].append(str(t.__dict__))
 
+    return jsonify(result)
+
+@APP.route('/transfer', methods=['POST'])
+def transfers():
+    """
+    Transfer money from one teams account to another
+
+    :param token: the auth token for the account
+    :param recipient: the id of the team to send the funds to
+    :param amount: amount to transfer
+    :returns result: json dict containing the transaction id or an error
+    """
+    result = dict()
+    data = request.get_json()
+    if data is None:
+        data = request.form
+        if data is None:
+            abort(400)
+
+    # make sure we have all the correct parameters
+    params = ['recipient', 'token', 'amount']
+    validate_request(params, data)
+
+    dst_id = data['recipient']
+    amount = data['amount']
+    token = data['token']
+
+    session = Session.query.filter_by(token=token).first()
+    if session is None:
+        raise errors.AuthError('Invalid session')
+
+    user = Users.query.filter_by(uuid=session.uuid).first()
+    dst_user = Users.query.filter_by(uuid=dst_id).first()
+    if dst_user is None:
+        raise errors.TeamError("Team id not found", status_code=404)
+
+    if user.balance < amount:
+        raise errors.TransactionError('Insufficient funds')
+
+    # transfer the funds
+    user.balance -= amount
+    dst_user.balance += amount
+
+    # add the transaction
+    now = time.time()
+    # dst = 0 because 0 is white team
+    tx = Transaction(time=now, src=user.uuid, dst=dst_id,
+                     desc="transfer to team {}".format(dst_id), amount=amount)
+    DB.session.add(tx)
+    DB.session.commit()
+
+    result['transaction_id'] = tx.uuid
     return jsonify(result)
