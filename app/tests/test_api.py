@@ -3,7 +3,8 @@
 """
 import json
 import unittest
-from app import APP, get_item_price
+from app import APP
+from app.util import get_item_price
 
 class ApiTestCases(unittest.TestCase):
     """
@@ -52,24 +53,18 @@ class ApiTestCases(unittest.TestCase):
         return result['balance']
 
     def test_login(self):
-        """
-        Test the login functionality of our app
-        """
+        """Test the login functionality of our app"""
         result = self.login('testuser', 'testpass')
         assert result is not None
 
     def test_balance(self):
-        """
-        Test if we can get the balance of a user
-        """
+        """Test if we can get the balance of a user"""
         token = self.login('testuser', 'testpass')
         balance = self.get_balance(token)
         assert balance is not None
 
     def test_expire_session(self):
-        """
-        Test if expiring a session functions correctly
-        """
+        """Test if expiring a session functions correctly"""
         token = self.login('testuser', 'testpass')
         data = dict(token=token)
         result = self.app.post('/expire-session', data=data)
@@ -80,9 +75,7 @@ class ApiTestCases(unittest.TestCase):
         assert result.status_code == 403
 
     def test_update_token(self):
-        """
-        Test if you can update a token
-        """
+        """Test if you can update a token"""
         token = self.login('testuser', 'testpass')
         data = dict(old_token=token, new_token='heythere')
         result = self.app.post('/update-session', data=data)
@@ -100,9 +93,7 @@ class ApiTestCases(unittest.TestCase):
 
     @unittest.skip("demonstrating skipping")
     def test_buying_item(self):
-        """
-        Test if we can buy an item from the store
-        """
+        """Test if we can buy an item from the store"""
         token = self.login('testuser', 'testpass')
         item_price = get_item_price(1)
         data = dict(token=token, item_id=1)
@@ -123,11 +114,11 @@ class ApiTestCases(unittest.TestCase):
         token = self.login('testuser', 'testpass')
         data = dict(token=token)
         result = self.app.post('/transactions', data=data)
-        print result.data
         assert result.status_code == 200
-        assert 'transactions' in result.data
-        for tx in result.data['transactions']:
-            print tx
+
+        result_data = json.loads(result.data)
+        assert 'transactions' in result_data
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -10,6 +10,7 @@ from .models.users import Users
 from .models.transaction import Transaction
 from .models.item import Item
 from . import errors
+from .util import new_session
 
 
 @APP.route('/login', methods=['POST'])
@@ -32,12 +33,13 @@ def login():
 
     username = data['username']
     password = data['password']
+    token = data['token']
 
     user = Users.query.filter_by(username=username, password=password).first()
     if user is None:
         raise errors.AuthError('Invalid username or password')
 
-    new_session(user.uuid, data['token'], request.remote_addr)
+    new_session(user.uuid, token, request.remote_addr)
     result['success'] = "Successfully logged in"
 
     return jsonify(result)
@@ -94,8 +96,7 @@ def buy():
     if session is None:
         raise errors.AuthError('Invalid session')
 
-    uuid = session.uuid
-    user = Users.query.filter_by(uuid=uuid).first()
+    user = Users.query.filter_by(uuid=session.uuid).first()
     item = Item.query.filter_by(uuid=item_id).first()
     if item is None:
         raise errors.TransactionError('Item not be found', status_code=404)
@@ -199,36 +200,3 @@ def transactions():
         result['transactions'].append(str(t.__dict__))
 
     return jsonify(result)
-
-##
-## HELPER FUNCTIONS
-##
-
-def new_session(uuid, token, src):
-    """
-    Enters a new session for a user
-
-    :param uuid: the users id
-    :param token: the token to attach to their session
-    :param src: the source ip of the request
-    """
-    now = time.time()
-    session = Session.query.filter_by(uuid=uuid).first()
-    session.token = token
-    session.time = now
-    session.src = src
-    DB.session.commit()
-
-def get_item_price(item_id):
-    """
-    Returns the price of an item from the database
-
-    :param item_id: id of the item
-
-    :returns price: price of the item
-    """
-    item = Item.query.filter_by(uuid=item_id).first()
-    if item is None:
-        raise errors.TransactionError("Item not found", status_code=404)
-
-    return item.price
