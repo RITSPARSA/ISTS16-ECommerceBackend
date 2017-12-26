@@ -4,7 +4,7 @@
 import time
 from flask import request, jsonify, abort
 from sqlalchemy import or_
-from . import APP, DB
+from . import APP, DB, info_log, error_log
 from .models.session import Session
 from .models.users import Users
 from .models.transaction import Transaction

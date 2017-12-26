@@ -1,13 +1,18 @@
 """
     Initialize our database and flask app
 """
-
+import logging.config
 import sys
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from .config import SQLALCHEMY_DATABASE_URI
+from .config import SQLALCHEMY_DATABASE_URI, LOG_CONFIG
+
+# Set up our logger
+logging.config.dictConfig(LOG_CONFIG)
+logging.getLogger().setLevel(logging.DEBUG)
+info_log = logging.getLogger('info_log')
+error_log = logging.getLogger('error_log')
 
 APP = Flask(__name__)
 
