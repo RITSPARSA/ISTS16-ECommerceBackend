@@ -13,10 +13,12 @@ class Item(DB.Model):
 
     __tablename__ = 'items'
     uuid = DB.Column(DB.Integer, primary_key=True, autoincrement=True)
+    name = DB.Column(DB.String(128))
     price = DB.Column(DB.Integer)
 
-    def __init__(self, price=None):
+    def __init__(self, name=None, price=None):
+        self.name = name
         self.price = price
 
     def __repr__(self):
-        return '<Item id={} price={}>'.format(self.uuid, self.price)
+        return '<Item id={} name={} price={}>'.format(self.uuid, self.name, self.price)

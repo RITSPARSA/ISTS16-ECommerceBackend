@@ -4,7 +4,7 @@
 import time
 from flask import request, jsonify, abort
 from sqlalchemy import or_
-from . import APP, DB
+from . import APP, DB, logger
 from .models.session import Session
 from .models.users import Users
 from .models.transaction import Transaction
@@ -80,7 +80,6 @@ def get_balance():
 
     return jsonify(result)
 
-
 @APP.route('/buy', methods=['POST'])
 def buy():
     """
@@ -127,6 +126,7 @@ def buy():
     DB.session.commit()
     result['transaction_id'] = tx.uuid
 
+    logger.info("Team %d bought item %d - [tx id: %d]", user.uuid, item.uuid, tx.uuid)
     return jsonify(result)
 
 @APP.route('/expire-session', methods=['POST'])
@@ -274,6 +274,7 @@ def transfers():
                      desc="transfer to team {}".format(dst_id), amount=amount)
     DB.session.add(tx)
     DB.session.commit()
-
+    
+    logger.info("Team %d transfered %d$ to Team %d - [tx id: %d]", user.uuid, amount, dst_id, tx.uuid)
     result['transaction_id'] = tx.uuid
     return jsonify(result)

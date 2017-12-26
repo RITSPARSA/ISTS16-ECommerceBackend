@@ -1,8 +1,8 @@
 """
     Errors our API can raise
 """
-from flask import jsonify
-from . import APP
+from flask import jsonify, request
+from . import APP, logger
 
 
 class APIErrors(Exception):
@@ -48,6 +48,8 @@ class RequestError(APIErrors):
 @APP.errorhandler(APIErrors)
 def handle_api_error(error):
     """flask error handler for our custom errors"""
+    logger.error("[%s] - %s", request.remote_addr, error.to_dict()['error'])
+
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
