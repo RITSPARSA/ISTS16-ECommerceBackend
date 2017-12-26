@@ -80,7 +80,6 @@ def get_balance():
 
     return jsonify(result)
 
-
 @APP.route('/buy', methods=['POST'])
 def buy():
     """
