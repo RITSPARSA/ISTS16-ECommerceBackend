@@ -11,8 +11,8 @@ from .config import SQLALCHEMY_DATABASE_URI, LOG_CONFIG
 # Set up our logger
 logging.config.dictConfig(LOG_CONFIG)
 logging.getLogger().setLevel(logging.DEBUG)
-info_log = logging.getLogger('info_log')
-error_log = logging.getLogger('error_log')
+logger = logging.getLogger('api_log')
+
 
 APP = Flask(__name__)
 

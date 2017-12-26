@@ -2,9 +2,19 @@
 Configuration settings.
 """
 import os
+import logging
 import sys
 
 SQLALCHEMY_DATABASE_URI = 'mysql://root:youwontguess23$@localhost/ists'
+
+
+class InfoFilter(logging.Filter):
+    def filter(self, rec):
+        return rec.levelno == logging.INFO
+
+class ErrorFilter(logging.Filter):
+    def filter(self, rec):
+        return rec.levelno == logging.ERROR
 
 LOG_CONFIG = {
     'version': 1,
@@ -14,14 +24,23 @@ LOG_CONFIG = {
             'format': '%(asctime)s [%(levelname)s] %(message)s'
         },
     },
+    'filters': {
+        'info_filter': {
+            '()': InfoFilter,
+        },
+        'error_filter': {
+            '()': ErrorFilter,
+        }
+    },
     'handlers': {
         'info': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename':  os.path.join(sys.path[0], 'app/logs/info.log'),
             'mode': 'a',
-            'backupCount': '16'
+            'backupCount': '16',
+            'filters': ['info_filter']
         },
         'error': {
             'level': 'ERROR',
@@ -29,11 +48,11 @@ LOG_CONFIG = {
             'class': 'logging.handlers.RotatingFileHandler',
             'filename':  os.path.join(sys.path[0], 'app/logs/error.log'),
             'mode': 'a',
-            'backupCount': '16'
+            'backupCount': '16',
+            'filters': ['error_filter']
         },
     },
     'loggers': {
-        'info_log': {'handlers': ['info'], 'level': 'INFO', 'propagate': False},
-        'error_log': {'handlers': ['error'], 'level': 'ERROR', 'propagate': False},
+        'api_log': {'handlers': ['info', 'error'], 'level': 'DEBUG', 'propagate': False},
     }
 }
