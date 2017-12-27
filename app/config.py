@@ -4,9 +4,8 @@ Configuration settings.
 import os
 import logging
 import sys
-
-SQLALCHEMY_DATABASE_URI = 'mysql://root:youwontguess23$@localhost/ists'
-
+import string
+import random
 
 class InfoFilter(logging.Filter):
     def filter(self, rec):
@@ -15,6 +14,13 @@ class InfoFilter(logging.Filter):
 class ErrorFilter(logging.Filter):
     def filter(self, rec):
         return rec.levelno == logging.ERROR
+
+NUMBER_OF_TEAMS = 12
+DEFAULT_PASSWORD = 'Changeme-2018'
+DEFAULT_BALANCE = 1000
+DEFAULT_PINS = [''.join(random.choice(string.digits) for _ in range(4))
+                for _ in range(NUMBER_OF_TEAMS + 1)]
+SQLALCHEMY_DATABASE_URI = 'mysql://root:youwontguess23$@localhost/ists'
 
 LOG_CONFIG = {
     'version': 1,
@@ -56,3 +62,20 @@ LOG_CONFIG = {
         'api_log': {'handlers': ['info', 'error'], 'level': 'DEBUG', 'propagate': False},
     }
 }
+
+TEAMS = [x for x in range(1, NUMBER_OF_TEAMS+1)]
+
+ITEMS = [
+    {
+        'name': 'MICAH HUG',
+        'price': 10
+    },
+    {
+        'name': 'JOES LOVE',
+        'price': 69
+    },
+    {
+        'name': 'DON RANT',
+        'price': 200
+    }
+]
