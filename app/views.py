@@ -48,6 +48,47 @@ def login():
 
     return jsonify(result)
 
+@APP.route('/update-password', methods=['POST'])
+def update_password():
+    """
+    Updates a teams password
+
+    :param old_password: old team password
+    :param new_password: new team password
+    :param token: the auth token for the account
+
+    :returns result: json dict containing either a success or and error
+    """
+    result = dict()
+    data = request.get_json()
+    if data is None:
+        data = request.form
+        if data is None:
+            abort(400)
+
+    # make sure we have all the correct parameters
+    params = ['old_password', 'token', 'new_password']
+    validate_request(params, data)
+
+    old_password = data['old_password']
+    new_password = data['new_password']
+    token = data['token']
+
+    session = Session.query.filter_by(token=token).first()
+    if session is None:
+        raise errors.AuthError('Invalid session')
+    
+
+    user = Users.query.filter_by(uuid=session.uuid).first()
+    if user.password != old_password:
+        raise errors.AuthError("Old password does not match")
+
+    user.password = new_password
+    DB.session.commit()
+    result['success'] = "Successfully updated password"
+
+    return jsonify(result)
+
 @APP.route('/get-balance', methods=['POST'])
 def get_balance():
     """
