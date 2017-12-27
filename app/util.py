@@ -4,7 +4,7 @@
 import time
 from . import APP, DB
 from .models.session import Session
-from .models.users import Users
+from .models.teams import Team
 from .models.transaction import Transaction
 from .models.item import Item
 from . import errors
