@@ -10,6 +10,9 @@ from app.config import DEFAULT_BALANCE, DEFAULT_PASSWORD
 class ApiTestCases(unittest.TestCase):
     """Collection of unit tests for the different API endpoints"""
 
+    TEST_USER = "team1"
+    TEST_PASS = "Changeme-2018"
+
     def setUp(self):
         """
         Set up our testing client

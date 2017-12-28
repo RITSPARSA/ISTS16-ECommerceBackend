@@ -319,3 +319,19 @@ def transfers():
                 user.uuid, amount, dst_id, tx.uuid)
     result['transaction_id'] = tx.uuid
     return jsonify(result)
+
+
+@APP.route('/items', methods=['GET'])
+def get_items():
+    """
+    Items and their price from the white team store
+
+    :return result: json dict containg either the id of the transaction or an error
+    """
+    result = dict()
+    result['items'] = []
+    items = Item.query.all()
+    for i in items:
+        result['items'].append(str(i.__dict__))
+
+    return jsonify(result)
