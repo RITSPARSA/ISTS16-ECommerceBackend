@@ -32,5 +32,5 @@ class Transaction(DB.Model):
         self.amount = amount
 
     def __repr__(self):
-        return '<Transaction id={} time={} src={} dst={} amount={} desc={}>'.format(
+        return '<Transaction uuid={} time={} src={} dst={} amount={} desc={}>'.format(
             self.uuid, self.time, self.src, self.dst, self.amount, self.desc)

@@ -3,7 +3,9 @@
 """
 import json
 import unittest
-from app import APP
+from app import APP, DB
+from app.models.teams import Team
+from app.config import DEFAULT_BALANCE, DEFAULT_PASSWORD
 
 class ApiTestCases(unittest.TestCase):
     """Collection of unit tests for the different API endpoints"""
@@ -14,6 +16,15 @@ class ApiTestCases(unittest.TestCase):
         """
         APP.testing = True
         self.app = APP.test_client()
+
+    def tearDown(self):
+        # reset everyones balance and password back the default
+        teams = Team.query.all()
+        for t in teams:
+            t.balance = DEFAULT_BALANCE
+            t.passsword = DEFAULT_PASSWORD
+
+        DB.session.commit()
 
     def login(self, username, password):
         """

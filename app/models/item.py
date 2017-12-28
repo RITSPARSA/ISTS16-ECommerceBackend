@@ -21,4 +21,4 @@ class Item(DB.Model):
         self.price = price
 
     def __repr__(self):
-        return '<Item id={} name={} price={}>'.format(self.uuid, self.name, self.price)
+        return '<Item uuid={} name={} price={}>'.format(self.uuid, self.name, self.price)

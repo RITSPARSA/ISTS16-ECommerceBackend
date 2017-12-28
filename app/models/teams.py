@@ -7,7 +7,7 @@ class Team(DB.Model):
     """
     Represents a team in our database
 
-    :param id: the id of the team
+    :param uuid: the id of the team
     :param username: the username of the team
     :param password: the teams password
     :param balance: the balance of their account
@@ -28,4 +28,4 @@ class Team(DB.Model):
         self.pin = pin
 
     def __repr__(self):
-        return '<Team id={} balance={}>'.format(self.uuid, self.balance)
+        return '<Team uuid={} balance={}>'.format(self.uuid, self.balance)

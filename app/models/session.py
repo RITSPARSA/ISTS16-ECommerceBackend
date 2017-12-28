@@ -7,7 +7,7 @@ class Session(DB.Model):
     """
     Represents a users session
 
-    :param id: the id of the user (the team number)
+    :param uuid: the id of the user (the team number)
     :param token: there unique session id
     :param time: the timestamp this session was created
     :param src: the src ip that initiated this session
@@ -26,4 +26,5 @@ class Session(DB.Model):
         self.src = src
 
     def __repr__(self):
-        return '<Session id={} token={} time={} ip={}>'.format(self.uuid, self.token, self.time, self.src)
+        return '<Session uudid={} token={} time={} ip={}>'.format(
+            self.uuid, self.token, self.time, self.src)
