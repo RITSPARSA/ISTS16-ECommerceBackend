@@ -332,6 +332,10 @@ def get_items():
     result['items'] = []
     items = Item.query.all()
     for i in items:
-        result['items'].append(str(i.__dict__))
+        item_dict = dict()
+        item_dict['name'] = i.__dict__['name']
+        item_dict['price'] = i.__dict__['price']
+        item_dict['uuid'] = i.__dict__['uuid']
+        result['items'].append(item_dict)
 
     return jsonify(result)
