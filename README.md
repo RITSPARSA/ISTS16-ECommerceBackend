@@ -30,6 +30,33 @@ Login with a users credentials, send token with credentials, will be attached to
 ```
 ---
 
+## POST /update-password
+Update a users password
+
+### Parameters
+```
+{
+    old_password: [string],
+    new_password: [string],
+    token: [string],
+}
+```
+
+### Response
+**Status Code: 200**
+```
+{
+    success: [string]
+}
+```
+**Status Code: 400+**
+```
+{
+    error: [string]
+}
+```
+---
+
 ## POST /get-balance
 Get the balance for the users account
 
@@ -147,6 +174,58 @@ Return a list of the transactions made on their account
 ```
 {
     transactions: [array[strings]]
+}
+```
+**Status Code: 400+**
+```
+{
+    error: [string]
+}
+```
+---
+
+## POST /items
+Return a list of the items to be bought from whiteteam store
+
+### Parameters
+```
+{
+    token: [string]
+}
+```
+
+### Response
+**Status Code: 200**
+```
+{
+    items: [array[dicts]]
+}
+```
+**Status Code: 400+**
+```
+{
+    error: [string]
+}
+```
+---
+
+## POST /transfer
+Transfer money from one team to another
+
+### Parameters
+```
+{
+    token: [string],
+    recipient: [int],
+    amount: [int]
+}
+```
+
+### Response
+**Status Code: 200**
+```
+{
+    transaction_id: [int]
 }
 ```
 **Status Code: 400+**
