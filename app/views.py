@@ -262,7 +262,9 @@ def transactions():
     user = Team.query.filter_by(uuid=session.uuid).first()
     txs = Transaction.query.filter(or_(Transaction.src == user.uuid, Transaction.dst == user.uuid))
     for t in txs:
-        result['transactions'].append(str(t.__dict__))
+        tx_dict = t.__dict__
+        del tx_dict['_sa_instance_state']
+        result['transactions'].append(tx_dict)
 
     return jsonify(result)
 
