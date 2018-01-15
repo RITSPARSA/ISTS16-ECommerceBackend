@@ -31,17 +31,17 @@ class AuthError(APIErrors):
 
 class TransactionError(APIErrors):
     """Errors with buying/transfering"""
-    def __init__(self, message=None, status_code=403):
+    def __init__(self, message=None, status_code=200):
         APIErrors.__init__(self, message, status_code)
 
 class TeamError(APIErrors):
     """IErrors with team accounts"""
-    def __init__(self, message=None, status_code=403):
+    def __init__(self, message=None, status_code=200):
         APIErrors.__init__(self, message, status_code)
 
 class RequestError(APIErrors):
     """Errros with missing or malformed request parameters"""
-    def __init__(self, message=None, status_code=403):
+    def __init__(self, message=None, status_code=400):
         APIErrors.__init__(self, message, status_code)
 
 

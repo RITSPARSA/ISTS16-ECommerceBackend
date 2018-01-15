@@ -30,6 +30,31 @@ Login with a users credentials, send token with credentials, will be attached to
 ```
 ---
 
+## POST /validate-session
+Validates a users session is still authorized
+
+### Parameters
+```
+{
+    token: [string],
+}
+```
+
+### Response
+**Status Code: 200**
+```
+{
+    success: [string]
+}
+```
+**Status Code: 400+**
+```
+{
+    error: [string]
+}
+```
+---
+
 ## POST /update-password
 Update a users password
 

@@ -12,6 +12,35 @@ from .models.item import Item
 from . import errors
 from .util import new_session, validate_request
 
+@APP.route('/validate-session', methods=['POST'])
+def validate_session():
+    """
+    Validates if the session is valid for the team
+
+    :param token: the token for the users session
+    :param team_id: the team number the session is for
+
+    :returns: json dict containing either success or an error
+    """
+    result = dict()
+    data = request.get_json()
+    if data is None:
+        data = request.form
+        if data is None:
+            abort(400)
+
+    # make sure we have all the correct parameters
+    params = ['token']
+    validate_request(params, data)
+
+    token = data['token']
+    session = Session.query.filter_by(token=token).first()
+    if session is None:
+        raise errors.AuthError('Invalid session')
+
+    result['success'] = "Authorized"
+
+    return jsonify(result)
 
 @APP.route('/login', methods=['POST'])
 def login():
@@ -22,7 +51,7 @@ def login():
     :param password: teams password
     :param token: the auth token to be attached to this account
 
-    :returns result: json dict containing either a success or and error
+    :returns result: json dict containing either a success or an error
     """
     result = dict()
     data = request.get_json()
@@ -44,7 +73,7 @@ def login():
         raise errors.AuthError('Invalid username or password')
 
     new_session(user.uuid, token, request.remote_addr)
-    result['success'] = "Successfully logged in"
+    result['success'] = user.uuid
 
     return jsonify(result)
 
@@ -175,7 +204,7 @@ def expire_session():
     Set a teams auth token to NULL, essentially expiring their session
 
     :param token: the authentication token to expire, must be valid
-
+    :param team_id: the id of the team
     :return result: json dict containing either a success or an error
     """
     result = dict()
@@ -290,7 +319,7 @@ def transfers():
     validate_request(params, data)
 
     dst_id = data['recipient']
-    amount = data['amount']
+    amount = float(data['amount'])
     token = data['token']
 
     session = Session.query.filter_by(token=token).first()
@@ -302,6 +331,8 @@ def transfers():
     if dst_user is None:
         raise errors.TeamError("Team id not found", status_code=404)
 
+    print amount
+    print user.balance
     if user.balance < amount:
         raise errors.TransactionError('Insufficient funds')
 
@@ -317,13 +348,13 @@ def transfers():
     DB.session.add(tx)
     DB.session.commit()
 
-    logger.info("Team %d transfered %d$ to Team %d - [tx id: %d]",
-                user.uuid, amount, dst_id, tx.uuid)
+    logger.info("Team %d transfered %f$ to Team %d - [tx id: %d]",
+                int(user.uuid), amount, int(dst_id), int(tx.uuid))
     result['transaction_id'] = tx.uuid
     return jsonify(result)
 
 
-@APP.route('/items', methods=['GET'])
+@APP.route('/items', methods=['POST'])
 def get_items():
     """
     Items and their price from the white team store
