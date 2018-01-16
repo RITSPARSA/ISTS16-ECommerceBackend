@@ -1,7 +1,7 @@
 """
     File to hold utility functions
 """
-import time
+import datetime
 from . import DB
 from .models.session import Session
 from .models.item import Item
@@ -16,7 +16,7 @@ def new_session(uuid, token, src):
     :param token: the token to attach to their session
     :param src: the source ip of the request
     """
-    now = time.time()
+    now = datetime.datetime.utcnow()
     session = Session.query.filter_by(uuid=uuid).first()
     session.token = token
     session.time = now

@@ -1,6 +1,7 @@
 """
     Document to represent a transactions
 """
+import datetime
 from app import DB
 
 class Transaction(DB.Model):
@@ -17,15 +18,14 @@ class Transaction(DB.Model):
 
     __tablename__ = 'transactions'
     uuid = DB.Column(DB.Integer, primary_key=True, autoincrement=True)
-    time = DB.Column(DB.Float())
+    time = DB.Column(DB.DateTime, default=datetime.datetime.utcnow)
     src = DB.Column(DB.Integer)
     dst = DB.Column(DB.Integer)
     desc = DB.Column(DB.String(128))
     amount = DB.Column(DB.Integer)
 
 
-    def __init__(self, time=None, src=None, dst=None, desc=None, amount=None):
-        self.time = time
+    def __init__(self, src=None, dst=None, desc=None, amount=None):
         self.src = src
         self.dst = dst
         self.desc = desc

@@ -1,6 +1,7 @@
 """
     Document to represent a users session
 """
+import datetime
 from app import DB
 
 class Session(DB.Model):
@@ -16,13 +17,13 @@ class Session(DB.Model):
     __tablename__ = 'session'
     uuid = DB.Column(DB.Integer, primary_key=True)
     token = DB.Column(DB.String(128))
-    time = DB.Column(DB.Float())
+    time = DB.Column(DB.DateTime, default=datetime.datetime.utcnow)
     src = DB.Column(DB.String(16))
 
-    def __init__(self, uuid=None, token=None, time=None, src=None):
+    def __init__(self, time=None, uuid=None, token=None, src=None):
+	self.time = time
         self.uuid = uuid
         self.token = token
-        self.time = time
         self.src = src
 
     def __repr__(self):

@@ -1,3 +1,4 @@
 import sys
-sys.path.append('/home/doshmajhan/ISTS16-Backend')
+sys.path.append('/var/www/ISTS16-Backend')
 from app import APP as application
+application.secret_key = "thedoshboi"

@@ -187,9 +187,8 @@ def buy():
 
     user.balance -= item.price
     # create our tranasction
-    now = time.time()
     # dst = 0 because 0 is white team
-    tx = Transaction(time=now, src=user.uuid, dst=0,
+    tx = Transaction(src=user.uuid, dst=0,
                      desc="bought item from shop", amount=item.price)
     DB.session.add(tx)
     DB.session.commit()
@@ -340,10 +339,8 @@ def transfers():
     user.balance -= amount
     dst_user.balance += amount
 
-    # add the transaction
-    now = time.time()
     # dst = 0 because 0 is white team
-    tx = Transaction(time=now, src=user.uuid, dst=dst_id,
+    tx = Transaction(src=user.uuid, dst=dst_id,
                      desc="transfer to team {}".format(dst_id), amount=amount)
     DB.session.add(tx)
     DB.session.commit()
