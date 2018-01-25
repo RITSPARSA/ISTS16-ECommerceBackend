@@ -43,7 +43,7 @@ LOG_CONFIG = {
             'level': 'DEBUG',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename':  os.path.join(sys.path[0], 'app/logs/info.log'),
+            'filename':  '/var/www/ISTS16-Backend/app/logs/info.log',
             'mode': 'a',
             'backupCount': '16',
             'filters': ['info_filter']
@@ -52,7 +52,7 @@ LOG_CONFIG = {
             'level': 'ERROR',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename':  os.path.join(sys.path[0], 'app/logs/error.log'),
+            'filename':  '/var/www/ISTS16-Backend/app/logs/error.log',
             'mode': 'a',
             'backupCount': '16',
             'filters': ['error_filter']
@@ -77,5 +77,49 @@ ITEMS = [
     {
         'name': 'DON RANT',
         'price': 200
+    },
+    {
+        'name': 'Red teamer hands off keyboard for 10 minutes',
+        'price': 100
+    },
+    {
+        'name': 'Red team advice',
+        'price': 100
+    },
+    {
+        'name': 'White team advice',
+        'price': 100
+    },
+    {
+        'name': 'Snapshot',
+        'price': 100
+    },
+    {
+        'name': 'Fresh config file for a server',
+        'price': 100
+    },
+    {
+        'name': "Turn off another team's power",
+        'price': 100
+    },
+    {
+        'name' : 'Spaceships',
+        'price': 100
+    },
+    {
+        'name': 'Upgrade your colony',
+        'price': 100
+    },
+    {
+        'name': 'Backdoor into the KOTH VMs',
+        'price': 100
+    },
+    {
+        'name': 'Back door into other teams servers',
+        'price': 100
+    },
+    {
+        'name': 'Power Bill',
+        'price': 100
     }
 ]
