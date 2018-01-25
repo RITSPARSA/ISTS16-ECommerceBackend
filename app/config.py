@@ -4,8 +4,6 @@ Configuration settings.
 import os
 import logging
 import sys
-import string
-import random
 
 class InfoFilter(logging.Filter):
     def filter(self, rec):
@@ -16,9 +14,6 @@ class ErrorFilter(logging.Filter):
         return rec.levelno == logging.ERROR
 
 AUTH_API_URL = "http://lilbite.org:9000"
-NUMBER_OF_TEAMS = 12
-DEFAULT_PASSWORD = 'Changeme-2018'
-DEFAULT_BALANCE = 1000
 
 SQLALCHEMY_DATABASE_URI = 'mysql://root:youwontguess23$@localhost/ists'
 
@@ -43,7 +38,7 @@ LOG_CONFIG = {
             'level': 'DEBUG',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename':  '/var/www/ISTS16-Backend/app/logs/info.log',
+            'filename':  '/home/dosh/ISTS16-Backend/app/logs/info.log',
             'mode': 'a',
             'backupCount': '16',
             'filters': ['info_filter']
@@ -52,7 +47,7 @@ LOG_CONFIG = {
             'level': 'ERROR',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename':  '/var/www/ISTS16-Backend/app/logs/error.log',
+            'filename':  '/home/dosh/ISTS16-Backend/app/logs/error.log',
             'mode': 'a',
             'backupCount': '16',
             'filters': ['error_filter']
@@ -62,8 +57,6 @@ LOG_CONFIG = {
         'api_log': {'handlers': ['info', 'error'], 'level': 'DEBUG', 'propagate': False},
     }
 }
-
-TEAMS = [x for x in range(1, NUMBER_OF_TEAMS+1)]
 
 ITEMS = [
     {
