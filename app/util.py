@@ -21,7 +21,7 @@ def validate_session(token):
     if 'success' not in resp:
         raise AuthError(resp['error'])
 
-    team_id = resp['team_id']
+    team_id = resp['success']
     return team_id
 
 def auth_api_request(endpoint, data):
