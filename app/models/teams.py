@@ -18,14 +18,16 @@ class Team(DB.Model):
     username = DB.Column(DB.String(64))
     password = DB.Column(DB.String(64))
     balance = DB.Column(DB.Float())
-    pin = DB.Column(DB.Integer)
+    pub_key = DB.Column(DB.String(2048))
+    private_key = DB.Column(DB.String(2048))
 
-    def __init__(self, uuid, username, password, balance, pin):
+    def __init__(self, uuid, username, password, balance, pub_key, private_key):
         self.uuid = uuid
         self.username = username
         self.password = password
         self.balance = balance
-        self.pin = pin
+        self.pub_key = pub_key
+        self.private_key = private_key
 
     def __repr__(self):
         return '<Team uuid={} balance={}>'.format(self.uuid, self.balance)

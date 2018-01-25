@@ -15,11 +15,11 @@ class ErrorFilter(logging.Filter):
     def filter(self, rec):
         return rec.levelno == logging.ERROR
 
+AUTH_API_URL = "http://lilbite.org:9000"
 NUMBER_OF_TEAMS = 12
 DEFAULT_PASSWORD = 'Changeme-2018'
 DEFAULT_BALANCE = 1000
-DEFAULT_PINS = [''.join(random.choice(string.digits) for _ in range(4))
-                for _ in range(NUMBER_OF_TEAMS + 1)]
+
 SQLALCHEMY_DATABASE_URI = 'mysql://root:youwontguess23$@localhost/ists'
 
 LOG_CONFIG = {

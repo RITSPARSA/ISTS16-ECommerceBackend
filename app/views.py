@@ -1,121 +1,15 @@
 """
     Entry point for API calls
 """
-import time
 from flask import request, jsonify, abort
 from sqlalchemy import or_
 from . import APP, DB, logger
-from .models.session import Session
 from .models.teams import Team
 from .models.transaction import Transaction
 from .models.item import Item
 from . import errors
-from .util import new_session, validate_request
+from .util import validate_request, validate_session
 
-@APP.route('/validate-session', methods=['POST'])
-def validate_session():
-    """
-    Validates if the session is valid for the team
-
-    :param token: the token for the users session
-    :param team_id: the team number the session is for
-
-    :returns: json dict containing either success or an error
-    """
-    result = dict()
-    data = request.get_json()
-    if data is None:
-        data = request.form
-        if data is None:
-            abort(400)
-
-    # make sure we have all the correct parameters
-    params = ['token']
-    validate_request(params, data)
-
-    token = data['token']
-    session = Session.query.filter_by(token=token).first()
-    if session is None:
-        raise errors.AuthError('Invalid session')
-
-    result['success'] = "Authorized"
-
-    return jsonify(result)
-
-@APP.route('/login', methods=['POST'])
-def login():
-    """
-    Verifies if a the submitted credentials are correct
-
-    :param username: username of the team
-    :param password: teams password
-    :param token: the auth token to be attached to this account
-
-    :returns result: json dict containing either a success or an error
-    """
-    result = dict()
-    data = request.get_json()
-    if data is None:
-        data = request.form
-        if data is None:
-            abort(400)
-
-    # make sure we have all the correct parameters
-    params = ['username', 'token', 'password']
-    validate_request(params, data)
-
-    username = data['username']
-    password = data['password']
-    token = data['token']
-
-    user = Team.query.filter_by(username=username, password=password).first()
-    if user is None:
-        raise errors.AuthError('Invalid username or password')
-
-    new_session(user.uuid, token, request.remote_addr)
-    result['success'] = user.uuid
-
-    return jsonify(result)
-
-@APP.route('/update-password', methods=['POST'])
-def update_password():
-    """
-    Updates a teams password
-
-    :param old_password: old team password
-    :param new_password: new team password
-    :param token: the auth token for the account
-
-    :returns result: json dict containing either a success or and error
-    """
-    result = dict()
-    data = request.get_json()
-    if data is None:
-        data = request.form
-        if data is None:
-            abort(400)
-
-    # make sure we have all the correct parameters
-    params = ['old_password', 'token', 'new_password']
-    validate_request(params, data)
-
-    old_password = data['old_password']
-    new_password = data['new_password']
-    token = data['token']
-
-    session = Session.query.filter_by(token=token).first()
-    if session is None:
-        raise errors.AuthError('Invalid session')
-
-    user = Team.query.filter_by(uuid=session.uuid).first()
-    if user.password != old_password:
-        raise errors.AuthError("Old password does not match")
-
-    user.password = new_password
-    DB.session.commit()
-    result['success'] = "Successfully updated password"
-
-    return jsonify(result)
 
 @APP.route('/get-balance', methods=['POST'])
 def get_balance():
@@ -138,12 +32,9 @@ def get_balance():
     validate_request(params, data)
 
     token = data['token']
-    session = Session.query.filter_by(token=token).first()
-    if session is None:
-        raise errors.AuthError('Invalid session')
+    team_id = validate_session(token)
 
-    uuid = session.uuid
-    user = Team.query.filter_by(uuid=uuid).first()
+    user = Team.query.filter_by(uuid=team_id).first()
     balance = user.balance
     result['balance'] = balance
 
@@ -172,11 +63,8 @@ def buy():
 
     token = data['token']
     item_id = data['item_id']
-    session = Session.query.filter_by(token=token).first()
-    if session is None:
-        raise errors.AuthError('Invalid session')
-
-    user = Team.query.filter_by(uuid=session.uuid).first()
+    team_id = validate_session(token)
+    user = Team.query.filter_by(uuid=team_id).first()
     item = Item.query.filter_by(uuid=item_id).first()
     if item is None:
         raise errors.TransactionError('Item not be found', status_code=404)
@@ -197,69 +85,6 @@ def buy():
     logger.info("Team %d bought item %d - [tx id: %d]", user.uuid, item.uuid, tx.uuid)
     return jsonify(result)
 
-@APP.route('/expire-session', methods=['POST'])
-def expire_session():
-    """
-    Set a teams auth token to NULL, essentially expiring their session
-
-    :param token: the authentication token to expire, must be valid
-    :param team_id: the id of the team
-    :return result: json dict containing either a success or an error
-    """
-    result = dict()
-    data = request.get_json()
-    if data is None:
-        data = request.form
-        if data is None:
-            abort(400)
-
-    # make sure we have all the correct parameters
-    params = ['token']
-    validate_request(params, data)
-
-    token = data['token']
-    session = Session.query.filter_by(token=token).first()
-    if session is None:
-        raise errors.AuthError('Invalid session')
-
-    session.token = None
-    DB.session.commit()
-    result['success'] = 'Token expired'
-
-    return jsonify(result)
-
-@APP.route('/update-session', methods=['POST'])
-def update_session():
-    """
-    Updates a teams auth token from an old one to a new one.
-
-    :param old_token: the old auth token, must be valid
-    :param new_token: the new token to be set
-
-    :returns result: json dict containg either a success or a error
-    """
-    result = dict()
-    data = request.get_json()
-    if data is None:
-        data = request.form
-        if data is None:
-            abort(400)
-
-    # make sure we have all the correct parameters
-    params = ['old_token', 'new_token']
-    validate_request(params, data)
-
-    old_token = data['old_token']
-    new_token = data['new_token']
-    session = Session.query.filter_by(token=old_token).first()
-    if session is None:
-        raise errors.AuthError('Invalid session')
-
-    session.token = new_token
-    DB.session.commit()
-    result['success'] = 'Token updated'
-
-    return jsonify(result)
 
 @APP.route('/transactions', methods=['POST'])
 def transactions():
@@ -283,11 +108,9 @@ def transactions():
     validate_request(params, data)
 
     token = data['token']
-    session = Session.query.filter_by(token=token).first()
-    if session is None:
-        raise errors.AuthError('Invalid session')
+    team_id = validate_session(token)
 
-    user = Team.query.filter_by(uuid=session.uuid).first()
+    user = Team.query.filter_by(uuid=team_id).first()
     txs = Transaction.query.filter(or_(Transaction.src == user.uuid, Transaction.dst == user.uuid))
     for t in txs:
         tx_dict = t.__dict__
@@ -320,12 +143,8 @@ def transfers():
     dst_id = data['recipient']
     amount = float(data['amount'])
     token = data['token']
-
-    session = Session.query.filter_by(token=token).first()
-    if session is None:
-        raise errors.AuthError('Invalid session')
-
-    user = Team.query.filter_by(uuid=session.uuid).first()
+    team_id = validate_session(token)
+    user = Team.query.filter_by(uuid=team_id).first()
     dst_user = Team.query.filter_by(uuid=dst_id).first()
     if dst_user is None:
         raise errors.TeamError("Team id not found", status_code=404)

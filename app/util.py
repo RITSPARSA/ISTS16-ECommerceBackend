@@ -1,27 +1,55 @@
 """
     File to hold utility functions
 """
-import datetime
-from . import DB
-from .models.session import Session
+import requests
+from .config import AUTH_API_URL
 from .models.item import Item
-from . import errors
+from .errors import RequestError, AuthError, TransactionError
 
-
-def new_session(uuid, token, src):
+def validate_session(token):
     """
-    Enters a new session for a user
+    Sends token to auth server to validate, should recieve
+    associated team number if it is valid
 
-    :param uuid: the users id
-    :param token: the token to attach to their session
-    :param src: the source ip of the request
+    :param token: the session token to validate
+
+    :return team_id: the id of the team the token is attached to
     """
-    now = datetime.datetime.utcnow()
-    session = Session.query.filter_by(uuid=uuid).first()
-    session.token = token
-    session.time = now
-    session.src = src
-    DB.session.commit()
+    post_data = dict()
+    post_data['token'] = token
+    resp = auth_api_request('validate-session', post_data)
+    if 'success' not in resp:
+        raise AuthError(resp['error'])
+
+    team_id = resp['team_id']
+    return team_id
+
+def auth_api_request(endpoint, data):
+    """
+    Makes a request to our api and returns the response
+
+    :param endpoint: the api endpoint to hit
+    :param data: the data to send in dictionary format
+    :param url: the url of the api
+
+    :returns resp: the api response
+    """
+    print data
+    url = "{}/{}".format(AUTH_API_URL, endpoint)
+
+    resp = requests.post(url, data=data)
+    if resp.status_code == 400:
+        raise RequestError("Bad request sent to API")
+
+    if resp.status_code == 403:
+        raise AuthError(resp.json()['error'])
+
+    elif resp.status_code != 200:
+        raise RequestError("API returned {} for /{}".format(
+            resp.status_code, endpoint))
+
+    resp_data = resp.json()
+    return resp_data
 
 def get_item_price(item_id):
     """
@@ -33,7 +61,7 @@ def get_item_price(item_id):
     """
     item = Item.query.filter_by(uuid=item_id).first()
     if item is None:
-        raise errors.TransactionError("Item not found", status_code=404)
+        raise TransactionError("Item not found", status_code=404)
 
     return item.price
 
@@ -46,6 +74,6 @@ def validate_request(params, data):
     """
     for p in params:
         if p not in data:
-            raise errors.RequestError("Missing {}".format(p), status_code=400)
+            raise RequestError("Missing {}".format(p), status_code=400)
 
     return True
