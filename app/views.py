@@ -77,12 +77,12 @@ def buy():
     # create our tranasction
     # dst = 0 because 0 is white team
     tx = Transaction(src=user.uuid, dst=0,
-                     desc="bought item from shop", amount=item.price)
+                     desc="bought {} from shop".format(item.name), amount=item.price)
     DB.session.add(tx)
     DB.session.commit()
     result['transaction_id'] = tx.uuid
 
-    logger.info("Team %d bought item %d - [tx id: %d]", user.uuid, item.uuid, tx.uuid)
+    logger.info("Team %d bought item %s - [tx id: %d]", user.uuid, item.name, tx.uuid)
     return jsonify(result)
 
 
