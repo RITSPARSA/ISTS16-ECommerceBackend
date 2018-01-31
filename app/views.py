@@ -8,7 +8,7 @@ from .models.teams import Team
 from .models.transaction import Transaction
 from .models.item import Item
 from . import errors
-from .util import validate_request, validate_session
+from .util import validate_request, validate_session, post_slack
 
 
 @APP.route('/get-balance', methods=['POST'])
@@ -76,10 +76,12 @@ def buy():
     user.balance -= item.price
     # create our tranasction
     # dst = 0 because 0 is white team
+    description = "{} bought {} from shop".format(user.username, item.name)
     tx = Transaction(src=user.uuid, dst=0,
-                     desc="bought {} from shop".format(item.name), amount=item.price)
+                     desc=description, amount=item.price)
     DB.session.add(tx)
     DB.session.commit()
+    post_slack(description)
     result['transaction_id'] = tx.uuid
 
     logger.info("Team %d bought item %s - [tx id: %d]", user.uuid, item.name, tx.uuid)

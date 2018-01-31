@@ -2,7 +2,7 @@
     File to hold utility functions
 """
 import requests
-from .config import AUTH_API_URL
+from .config import AUTH_API_URL, SLACK_URI, CHANNEL, SLACK_USERNAME, ICON_EMOJI
 from .models.item import Item
 from .errors import RequestError, AuthError, TransactionError
 
@@ -77,3 +77,18 @@ def validate_request(params, data):
             raise RequestError("Missing {}".format(p), status_code=400)
 
     return True
+
+def post_slack(message):
+    """
+    Posts a message to our white team slack
+
+    :param message: the message to post to slack
+    """
+    post_data = dict({
+        "text":  message,
+        "channel": CHANNEL,
+        "link_names": 1,
+        "username": SLACK_USERNAME,
+        "icon_emoji": ICON_EMOJI
+    })
+    requests.post(SLACK_URI, json=post_data)
