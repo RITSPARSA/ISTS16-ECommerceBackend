@@ -37,7 +37,7 @@ def get_balance():
     user = Team.query.filter_by(uuid=team_id).first()
     balance = user.balance
     result['balance'] = balance
-
+    result['team_id'] = team_id
     return jsonify(result)
 
 @APP.route('/buy', methods=['POST'])
