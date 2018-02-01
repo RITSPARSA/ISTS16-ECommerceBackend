@@ -94,6 +94,7 @@ def post_slack(message, team='white'):
     post_data["icon_emoji"] = ICON_EMOJI
 
     if team == 'red':
+        post_data['channel'] = "#box-resets"
         slack_uri = REDTEAM_SLACK_URI
     else:
         slack_uri = WHITETEAM_SLACK_URI
