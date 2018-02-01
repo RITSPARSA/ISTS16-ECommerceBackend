@@ -43,7 +43,7 @@ LOG_CONFIG = {
             'level': 'DEBUG',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename':  '/home/dosh/ISTS16-Backend/app/logs/info.log',
+            'filename':  '/var/www/ISTS16-Backend/app/logs/info.log',
             'mode': 'a',
             'backupCount': '16',
             'filters': ['info_filter']
@@ -52,7 +52,7 @@ LOG_CONFIG = {
             'level': 'ERROR',
             'formatter': 'standard',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename':  '/home/dosh/ISTS16-Backend/app/logs/error.log',
+            'filename':  '/var/www/ISTS16-Backend/app/logs/error.log',
             'mode': 'a',
             'backupCount': '16',
             'filters': ['error_filter']
