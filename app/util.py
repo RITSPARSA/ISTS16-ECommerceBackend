@@ -127,4 +127,4 @@ def ship_api_request(token, item, team_id):
         post_data['value'] = 50
 
     requests.post("{}/teams/{}/boost".format(SHIP_API_URL, team_id),
-                  data=post_data, cookies=cookies)
+                  json=post_data, cookies=cookies)
