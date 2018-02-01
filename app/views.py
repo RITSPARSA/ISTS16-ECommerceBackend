@@ -8,7 +8,8 @@ from .models.teams import Team
 from .models.transaction import Transaction
 from .models.item import Item
 from . import errors
-from .util import validate_request, validate_session, post_slack
+from .util import validate_request, validate_session, post_slack, ship_api_request
+from .config import SHIP_API_ALERT_ITEMS, RED_TEAM_ALERT_ITEMS
 
 """
     BACKDOOR WHITE TEAM ROUTES
@@ -227,10 +228,17 @@ def buy():
                      desc=description, amount=item.price)
     DB.session.add(tx)
     DB.session.commit()
-    post_slack(description)
     result['transaction_id'] = tx.uuid
 
     logger.info("Team %d bought item %s - [tx id: %d]", user.uuid, item.name, tx.uuid)
+
+    # notify correct parties of the item being bought
+    post_slack(description, team='white')
+    if item.name in SHIP_API_ALERT_ITEMS:
+        ship_api_request(item.name, team_id)
+    elif item.name in RED_TEAM_ALERT_ITEMS:
+        post_slack(description, team='red')
+
     return jsonify(result)
 
 
