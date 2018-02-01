@@ -109,7 +109,9 @@ def ship_api_request(token, item, team_id):
     :param team_id: the id of the team
     """
     post_data = dict()
-    post_data['token'] = token
+    cookies = dict()
+    cookies['token'] = token
+
     if 'health' in item.lower():
         post_data['type'] = 'health'
     elif 'damage' in item.lower():
@@ -125,4 +127,4 @@ def ship_api_request(token, item, team_id):
         post_data['value'] = 50
 
     requests.post("{}/teams/{}/boost".format(SHIP_API_URL, team_id),
-                  data=post_data)
+                  data=post_data, cookies=cookies)
