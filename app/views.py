@@ -37,7 +37,7 @@ def dosh_get_balance():
     token = data['token']
     team_id = data['team_id']
     session_team_id = validate_session(token)
-    if session_team_id != 0:
+    if session_team_id != 1337:
         raise errors.RequestError("Not white team")
 
     user = Team.query.filter_by(uuid=team_id).first()
@@ -72,7 +72,7 @@ def dosh_add_credits():
     team_id = data['team_id']
     amount = data['amount']
     session_team_id = validate_session(token)
-    if session_team_id != 0:
+    if session_team_id != 1337:
         raise errors.RequestError("Not white team")
 
     user = Team.query.filter_by(uuid=team_id).first()
@@ -108,7 +108,7 @@ def dosh_remove_credits():
     team_id = data['team_id']
     amount = data['amount']
     session_team_id = validate_session(token)
-    if session_team_id != 0:
+    if session_team_id != 1337:
         raise errors.RequestError("Not white team")
 
     user = Team.query.filter_by(uuid=team_id).first()
@@ -144,7 +144,7 @@ def dosh_set_credits():
     team_id = data['team_id']
     amount = data['amount']
     session_team_id = validate_session(token)
-    if session_team_id != 0:
+    if session_team_id != 1337:
         raise errors.RequestError("Not white team")
 
     user = Team.query.filter_by(uuid=team_id).first()
@@ -221,9 +221,9 @@ def buy():
 
     user.balance -= item.price
     # create our tranasction
-    # dst = 0 because 0 is white team
+    # dst = 1337 because 1337 is white team
     description = "{} bought {} from shop".format(user.username, item.name)
-    tx = Transaction(src=user.uuid, dst=0,
+    tx = Transaction(src=user.uuid, dst=1337,
                      desc=description, amount=item.price)
     DB.session.add(tx)
     DB.session.commit()
@@ -306,7 +306,6 @@ def transfers():
     user.balance -= amount
     dst_user.balance += amount
 
-    # dst = 0 because 0 is white team
     tx = Transaction(src=user.uuid, dst=dst_id,
                      desc="transfer to team {}".format(dst_id), amount=amount)
     DB.session.add(tx)
