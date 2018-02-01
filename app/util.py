@@ -100,7 +100,7 @@ def post_slack(message, team='white'):
 
     requests.post(slack_uri, json=post_data)
 
-def ship_api_request(item, team_id):
+def ship_api_request(token, item, team_id):
     """
     Notifies our ship api that a escort mission item has been bought
 
@@ -109,7 +109,7 @@ def ship_api_request(item, team_id):
     :param team_id: the id of the team
     """
     post_data = dict()
-    post_data['token']
+    post_data['token'] = token
     if 'health' in item.lower():
         post_data['type'] = 'health'
     elif 'damage' in item.lower():
