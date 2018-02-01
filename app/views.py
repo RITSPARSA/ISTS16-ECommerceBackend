@@ -71,7 +71,7 @@ def dosh_add_credits():
 
     token = data['token']
     team_id = data['team_id']
-    amount = data['amount']
+    amount = float(data['amount'])
     session_team_id = validate_session(token)
     if session_team_id != 1337:
         raise errors.RequestError("Not white team")
@@ -107,7 +107,7 @@ def dosh_remove_credits():
 
     token = data['token']
     team_id = data['team_id']
-    amount = data['amount']
+    amount = float(data['amount'])
     session_team_id = validate_session(token)
     if session_team_id != 1337:
         raise errors.RequestError("Not white team")
@@ -143,7 +143,7 @@ def dosh_set_credits():
 
     token = data['token']
     team_id = data['team_id']
-    amount = data['amount']
+    amount = float(data['amount'])
     session_team_id = validate_session(token)
     if session_team_id != 1337:
         raise errors.RequestError("Not white team")
@@ -194,7 +194,7 @@ def buy():
 
     :param token: the auth token for the team
     :param item_id: the id of the item to buy
-
+    :param enemy_id(optional): if the item bought has a enemy_id
     :return result: json dict containg either the id of the transaction or an error
     """
     result = dict()
@@ -208,6 +208,7 @@ def buy():
     params = ['token', 'item_id']
     validate_request(params, data)
 
+    enemy_id = None
     token = data['token']
     item_id = data['item_id']
     team_id = validate_session(token)
@@ -235,7 +236,11 @@ def buy():
     # notify correct parties of the item being bought
     post_slack(description, team='white')
     if item.name in SHIP_API_ALERT_ITEMS:
-        ship_api_request(token, item.name, team_id)
+        if 'enemy_id' in data:
+            enemy_id = data['enemy_id']
+
+        ship_api_request(token, item.name, team_id, enemy_id)
+
     elif item.name in RED_TEAM_ALERT_ITEMS:
         post_slack("@channel {}".format(description), team='red')
 

@@ -101,17 +101,21 @@ def post_slack(message, team='white'):
 
     requests.post(slack_uri, json=post_data)
 
-def ship_api_request(token, item, team_id):
+def ship_api_request(token, item, team_id, enemy_id):
     """
     Notifies our ship api that a escort mission item has been bought
 
     :param token: the auth token for the backend
     :param item: the name of the item
     :param team_id: the id of the team
+    :param enemy_id: the id of the enemy team if they bought a powerup against them
     """
     post_data = dict()
     cookies = dict()
     cookies['token'] = token
+
+    # ADD DECREMENT FOR CERTAIN TEAM
+    # MAY NEEED TO SEND WHITE TEAM TOKEN INSTEAD 
 
     if 'health' in item.lower():
         post_data['type'] = 'health'
