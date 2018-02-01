@@ -71,7 +71,7 @@ def dosh_add_credits():
 
     token = data['token']
     team_id = data['team_id']
-    amount = data['amount']
+    amount = float(data['amount'])
     session_team_id = validate_session(token)
     if session_team_id != 1337:
         raise errors.RequestError("Not white team")
@@ -107,7 +107,7 @@ def dosh_remove_credits():
 
     token = data['token']
     team_id = data['team_id']
-    amount = data['amount']
+    amount = float(data['amount'])
     session_team_id = validate_session(token)
     if session_team_id != 1337:
         raise errors.RequestError("Not white team")
@@ -143,7 +143,7 @@ def dosh_set_credits():
 
     token = data['token']
     team_id = data['team_id']
-    amount = data['amount']
+    amount = float(data['amount'])
     session_team_id = validate_session(token)
     if session_team_id != 1337:
         raise errors.RequestError("Not white team")
