@@ -2,7 +2,8 @@
     File to hold utility functions
 """
 import requests
-from .config import AUTH_API_URL, SLACK_URI, CHANNEL, SLACK_USERNAME, ICON_EMOJI
+from .config import (AUTH_API_URL, WHITETEAM_SLACK_URI, CHANNEL, SLACK_USERNAME,
+                     ICON_EMOJI, REDTEAM_SLACK_URI, SHIP_API_URL)
 from .models.item import Item
 from .errors import RequestError, AuthError, TransactionError
 
@@ -78,17 +79,48 @@ def validate_request(params, data):
 
     return True
 
-def post_slack(message):
+def post_slack(message, team='white'):
     """
     Posts a message to our white team slack
 
     :param message: the message to post to slack
+    :param team: the slack team to post to
     """
-    post_data = dict({
-        "text":  message,
-        "channel": CHANNEL,
-        "link_names": 1,
-        "username": SLACK_USERNAME,
-        "icon_emoji": ICON_EMOJI
-    })
-    requests.post(SLACK_URI, json=post_data)
+    post_data = dict()
+    post_data["text"] = message
+    post_data["channel"] = CHANNEL
+    post_data["link_names"] = 1
+    post_data["username"] = SLACK_USERNAME
+    post_data["icon_emoji"] = ICON_EMOJI
+
+    if team == 'red':
+        slack_uri = REDTEAM_SLACK_URI
+    else:
+        slack_uri = WHITETEAM_SLACK_URI
+
+    requests.post(slack_uri, json=post_data)
+
+def ship_api_request(item, team_id):
+    """
+    Notifies our ship api that a escort mission item has been bought
+
+    :param item: the name of the item
+    :param team_id: the id of the team
+    """
+    post_data = dict()
+    if 'health' in item.lower():
+        post_data['type'] = 'health'
+    elif 'damage' in item.lower():
+        post_data['type'] = 'damage'
+    elif 'speed' in item.lower():
+        post_data['type'] = 'speed'
+
+    if 'enemy' in item.lower():
+        post_data['change'] = 'decrease'
+        post_data['value'] = -25
+    else:
+        post_data['change'] = 'increase'
+        post_data['value'] = 50
+
+    requests.post("{}/teams/{}/boost".format(SHIP_API_URL, team_id),
+                  data=post_data)
