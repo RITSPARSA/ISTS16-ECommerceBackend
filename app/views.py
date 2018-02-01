@@ -237,7 +237,7 @@ def buy():
     if item.name in SHIP_API_ALERT_ITEMS:
         ship_api_request(token, item.name, team_id)
     elif item.name in RED_TEAM_ALERT_ITEMS:
-        post_slack(description, team='red')
+        post_slack("@channel {}".format(description), team='red')
 
     return jsonify(result)
 
