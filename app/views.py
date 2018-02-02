@@ -222,6 +222,7 @@ def buy():
         raise errors.TransactionError('Insufficient funds')
 
     user.balance -= item.price
+    description = "{} bought {} from shop".format(user.username, item.name)
 
     # notify correct parties of the item being bought
     if item.name in SHIP_API_ALERT_ITEMS:
@@ -241,8 +242,6 @@ def buy():
     # dst = 1337 because 1337 is white team
     if enemy_id is not None:
         description = "{} bought {} from shop against Team {}".format(user.username, item.name, enemy_id)
-    else:
-        description = "{} bought {} from shop".format(user.username, item.name)
 
     tx = Transaction(src=user.username, dst="whiteteam",
                      desc=description, amount=item.price)
