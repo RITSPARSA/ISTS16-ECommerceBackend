@@ -230,8 +230,7 @@ def buy():
             if data['enemy_id']:
                 enemy_id = data['enemy_id']
                 if 'enemy' not in item.name.lower():
-                    result = {'error': "Can't buy this for an enemy"}
-                    return jsonify(result)
+                    enemy_id = None
 
         ship_api_request(token, item.name, team_id, enemy_id)
 
@@ -240,6 +239,7 @@ def buy():
 
     # create our tranasction
     # dst = 1337 because 1337 is white team
+    print enemy_id
     if enemy_id is not None:
         description = "{} bought {} from shop against Team {}".format(user.username, item.name, enemy_id)
 
