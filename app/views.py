@@ -222,16 +222,6 @@ def buy():
         raise errors.TransactionError('Insufficient funds')
 
     user.balance -= item.price
-    # create our tranasction
-    # dst = 1337 because 1337 is white team
-    description = "{} bought {} from shop".format(user.username, item.name)
-    tx = Transaction(src=user.username, dst="whiteteam",
-                     desc=description, amount=item.price)
-    DB.session.add(tx)
-    DB.session.commit()
-    result['transaction_id'] = tx.uuid
-
-    logger.info("Team %d bought item %s - [tx id: %d]", user.uuid, item.name, tx.uuid)
 
     # notify correct parties of the item being bought
     if item.name in SHIP_API_ALERT_ITEMS:
@@ -247,6 +237,20 @@ def buy():
     elif item.name in RED_TEAM_ALERT_ITEMS:
         post_slack("@channel {}".format(description), team='red')
 
+    # create our tranasction
+    # dst = 1337 because 1337 is white team
+    if enemy_id is not None:
+        description = "{} bought {} from shop against Team {}".format(user.username, item.name, enemy_id)
+    else:
+        description = "{} bought {} from shop".format(user.username, item.name)
+
+    tx = Transaction(src=user.username, dst="whiteteam",
+                     desc=description, amount=item.price)
+    DB.session.add(tx)
+    DB.session.commit()
+    result['transaction_id'] = tx.uuid
+
+    logger.info("Team %d bought item %s - [tx id: %d]", user.uuid, item.name, tx.uuid)
     post_slack(description, team='white')
 
     return jsonify(result)
