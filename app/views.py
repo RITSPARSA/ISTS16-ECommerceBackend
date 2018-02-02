@@ -234,7 +234,6 @@ def buy():
     logger.info("Team %d bought item %s - [tx id: %d]", user.uuid, item.name, tx.uuid)
 
     # notify correct parties of the item being bought
-    post_slack(description, team='white')
     if item.name in SHIP_API_ALERT_ITEMS:
         if 'enemy_id' in data:
             if data['enemy_id']:
@@ -247,6 +246,8 @@ def buy():
 
     elif item.name in RED_TEAM_ALERT_ITEMS:
         post_slack("@channel {}".format(description), team='red')
+
+    post_slack(description, team='white')
 
     return jsonify(result)
 
