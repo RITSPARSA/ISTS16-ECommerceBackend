@@ -112,13 +112,12 @@ def ship_api_request(token, item, team_id, enemy_id):
     :param enemy_id: the id of the enemy team if they bought a powerup against them
     """
     post_data = dict()
-    cookies = {}
 
     # for this type of request we need white team token
     if enemy_id is not None:
         token = Session.query.filter_by(uuid=1337).first()
 
-    cookies['token'] = token
+    cookies = {'token': str(token)}
 
     if 'striker' in item.lower():
         post_data['value'] = 1
