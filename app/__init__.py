@@ -4,6 +4,7 @@
 import logging.config
 import sys
 from flask import Flask
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
 from .config import SQLALCHEMY_DATABASE_URI, LOG_CONFIG
@@ -15,6 +16,7 @@ logger = logging.getLogger('api_log')
 
 
 APP = Flask(__name__)
+CORS(APP)
 
 try:
     print "Establishing database connection"
