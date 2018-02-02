@@ -5,6 +5,7 @@ import requests
 from .config import (AUTH_API_URL, WHITETEAM_SLACK_URI, CHANNEL, SLACK_USERNAME,
                      ICON_EMOJI, REDTEAM_SLACK_URI, SHIP_API_URL)
 from .models.item import Item
+from .models.session import Session
 from .errors import RequestError, AuthError, TransactionError
 
 def validate_session(token):
@@ -112,11 +113,12 @@ def ship_api_request(token, item, team_id, enemy_id):
     """
     post_data = dict()
     cookies = dict()
-    # REPLACE WITH WHITE ITEM
-    cookies['token'] = token
 
-    # ADD DECREMENT FOR CERTAIN TEAM
-    # MAY NEEED TO SEND WHITE TEAM TOKEN INSTEAD 
+    # for this type of request we need white team token
+    if enemy_id is not None:
+        token = Session.query.filter_by(uuid=1337).first()
+
+    cookies['token'] = token
 
     if 'health' in item.lower():
         post_data['type'] = 'health'
@@ -132,5 +134,9 @@ def ship_api_request(token, item, team_id, enemy_id):
         post_data['change'] = 'increase'
         post_data['value'] = 50
 
-    requests.post("{}/teams/{}/boost".format(SHIP_API_URL, team_id),
-                  json=post_data, cookies=cookies)
+    if enemy_id is not None:
+        requests.post("{}/teams/{}/boost".format(SHIP_API_URL, enemy_id),
+                      json=post_data, cookies=cookies)
+    else:
+        requests.post("{}/teams/{}/boost".format(SHIP_API_URL, team_id),
+                      json=post_data, cookies=cookies)
