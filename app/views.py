@@ -73,7 +73,7 @@ def dosh_add_credits():
     team_id = data['team_id']
     amount = float(data['amount'])
     session_team_id = validate_session(token)
-    if session_team_id != 1337:
+    if session_team_id != 1337 or session_team_id != 47:
         raise errors.RequestError("Not white team")
 
     user = Team.query.filter_by(uuid=team_id).first()
