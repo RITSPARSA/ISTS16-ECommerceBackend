@@ -308,7 +308,11 @@ def transfers():
     validate_request(params, data)
 
     dst_id = data['recipient']
-    amount = float(data['amount'])
+    try:
+        amount = float(data['amount'])
+    except Exception:
+        raise errors.TransactionError("Please enter a number")
+
     if amount < 0:
         raise errors.TransactionError("Can't do negative amounts")
 
