@@ -237,10 +237,11 @@ def buy():
     post_slack(description, team='white')
     if item.name in SHIP_API_ALERT_ITEMS:
         if 'enemy_id' in data:
-            enemy_id = data['enemy_id']
-            if 'enemy' not in item.name.lower():
-                result = {'error': "Can't buy this for an enemy"}
-                return jsonify(result)
+            if data['enemy_id']:
+                enemy_id = data['enemy_id']
+                if 'enemy' not in item.name.lower():
+                    result = {'error': "Can't buy this for an enemy"}
+                    return jsonify(result)
 
         ship_api_request(token, item.name, team_id, enemy_id)
 
