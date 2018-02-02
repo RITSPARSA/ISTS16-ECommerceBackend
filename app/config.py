@@ -75,11 +75,11 @@ LOG_CONFIG = {
 ITEMS = [
     {
         'name': 'MICAH HUG',
-        'price': 1000
+        'price': 100000
     },
     {
         'name': 'JOES LOVE',
-        'price': 69000
+        'price': 2500000
     },
     {
         'name': 'DON RANT',
@@ -110,7 +110,7 @@ ITEMS = [
         'price': 100000
     },
     {
-        'name': 'Enemey Speed -25%',
+        'name': 'Enemy Speed -25%',
         'price': 100000
     },
     {
