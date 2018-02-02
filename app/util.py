@@ -112,6 +112,7 @@ def ship_api_request(token, item, team_id, enemy_id):
     """
     post_data = dict()
     cookies = dict()
+    # REPLACE WITH WHITE ITEM
     cookies['token'] = token
 
     # ADD DECREMENT FOR CERTAIN TEAM

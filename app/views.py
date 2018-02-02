@@ -225,7 +225,7 @@ def buy():
     # create our tranasction
     # dst = 1337 because 1337 is white team
     description = "{} bought {} from shop".format(user.username, item.name)
-    tx = Transaction(src=user.uuid, dst=1337,
+    tx = Transaction(src=user.username, dst="whiteteam",
                      desc=description, amount=item.price)
     DB.session.add(tx)
     DB.session.commit()
@@ -272,7 +272,7 @@ def transactions():
     team_id = validate_session(token)
 
     user = Team.query.filter_by(uuid=team_id).first()
-    txs = Transaction.query.filter(or_(Transaction.src == user.uuid, Transaction.dst == user.uuid))
+    txs = Transaction.query.filter(or_(Transaction.src == user.username, Transaction.dst == user.username))
     for t in txs:
         tx_dict = t.__dict__
         del tx_dict['_sa_instance_state']
@@ -318,8 +318,8 @@ def transfers():
     # transfer the funds
     user.balance -= amount
     dst_user.balance += amount
-
-    tx = Transaction(src=user.uuid, dst=dst_id,
+    # change to team names instead of id
+    tx = Transaction(src=user.username, dst=dst_user.username,
                      desc="transfer to team {}".format(dst_id), amount=amount)
     DB.session.add(tx)
     DB.session.commit()

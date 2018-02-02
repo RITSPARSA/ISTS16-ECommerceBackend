@@ -19,8 +19,8 @@ class Transaction(DB.Model):
     __tablename__ = 'transactions'
     uuid = DB.Column(DB.Integer, primary_key=True, autoincrement=True)
     time = DB.Column(DB.DateTime, default=datetime.datetime.utcnow)
-    src = DB.Column(DB.Integer)
-    dst = DB.Column(DB.Integer)
+    src = DB.Column(DB.String(64))
+    dst = DB.Column(DB.String(64))
     desc = DB.Column(DB.String(128))
     amount = DB.Column(DB.Integer)
 
