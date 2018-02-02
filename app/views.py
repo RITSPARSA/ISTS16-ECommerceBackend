@@ -282,6 +282,8 @@ def transactions():
         del tx_dict['_sa_instance_state']
         result['transactions'].append(tx_dict)
 
+    # reverse in newest first
+    result['transactions'] = result['transactions'][::-1]
     return jsonify(result)
 
 @APP.route('/transfer', methods=['POST'])
@@ -307,6 +309,9 @@ def transfers():
 
     dst_id = data['recipient']
     amount = float(data['amount'])
+    if amount < 0:
+        raise errors.TransactionError("Can't do negative amounts")
+
     token = data['token']
     team_id = validate_session(token)
     user = Team.query.filter_by(uuid=team_id).first()
