@@ -128,7 +128,7 @@ def ship_api_request(token, item, team_id, enemy_id):
     
     if 'ship' in item.lower():
         post_data['value'] = -1
-        requests.post("{}/teams/{}/striker".format(SHIP_API_URL, team_id),
+        requests.post("{}/teams/{}/striker".format(SHIP_API_URL, enemy_id),
                       json=post_data, cookies=cookies)
 
         return None
