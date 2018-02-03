@@ -115,7 +115,8 @@ def ship_api_request(token, item, team_id, enemy_id):
     print "Make request for {} by {}".format(item, team_id)
     # for this type of request we need white team token
     if enemy_id is not None:
-        token = Session.query.filter_by(uuid=1337).first()
+        sesh = Session.query.filter_by(uuid=1337).first()
+        token = sesh.token
 
     cookies = {'token': str(token)}
 
@@ -125,7 +126,7 @@ def ship_api_request(token, item, team_id, enemy_id):
                       json=post_data, cookies=cookies)
 
         return None
-    
+
     if 'ship' in item.lower():
         post_data['value'] = -1
         requests.post("{}/teams/{}/striker".format(SHIP_API_URL, enemy_id),
