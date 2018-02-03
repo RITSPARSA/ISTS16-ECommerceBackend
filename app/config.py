@@ -26,7 +26,7 @@ ICON_EMOJI = ":money_with_wings:"
 
 SHIP_API_ALERT_ITEMS = ['x1 Strikers', 'Health +50%', 'Damage +50%',
                         'Speed +50%', 'Enemy Health -25%', 'Enemy Damage -25%',
-                        'Enemy Speed -25%']
+                        'Enemy Speed -25%', 'Destroy an enemy ship']
 
 RED_TEAM_ALERT_ITEMS = ['Snapshot Revert', 'Revert Raspberry Pi']
 
