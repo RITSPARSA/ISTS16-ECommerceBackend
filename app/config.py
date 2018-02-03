@@ -155,7 +155,7 @@ ITEMS = [
     },
     {
         'name': 'Snapshot Revert',
-        'price': 200000
+        'price': 400000
     },
     {
         'name': 'Revert Raspberry Pi',
