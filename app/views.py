@@ -71,14 +71,23 @@ def dosh_add_credits():
 
     token = data['token']
     team_id = data['team_id']
-    amount = float(data['amount'])
+    try:
+        amount = float(data['amount'])
+    except Exception:
+        raise errors.RequestError("Please enter a number")
+
     session_team_id = validate_session(token)
     if session_team_id != 1337 and session_team_id != 47:
         raise errors.RequestError("Not white team")
 
     user = Team.query.filter_by(uuid=team_id).first()
+    if user is None:
+        raise errors.TeamError("Team {} doesn't exist".format(team_id), status_code=404)
+
     user.balance += amount
     DB.session.commit()
+
+    logger.info("White Team added %d credtis for Team %d", amount, user.uuid)
 
     result['success'] = "Successfully added credits"
     return jsonify(result)
@@ -107,14 +116,23 @@ def dosh_remove_credits():
 
     token = data['token']
     team_id = data['team_id']
-    amount = float(data['amount'])
+    try:
+        amount = float(data['amount'])
+    except Exception:
+        raise errors.RequestError("Please enter a number")
+
     session_team_id = validate_session(token)
     if session_team_id != 1337:
         raise errors.RequestError("Not white team")
 
     user = Team.query.filter_by(uuid=team_id).first()
+    if user is None:
+        raise errors.TeamError("Team {} doesn't exist".format(team_id), status_code=404)
+
     user.balance -= amount
     DB.session.commit()
+
+    logger.info("White Team removed %d credtis for Team %d", amount, user.uuid)
 
     result['success'] = "Successfully removed credits"
     return jsonify(result)
@@ -138,19 +156,27 @@ def dosh_set_credits():
             abort(400)
 
     # make sure we have all the correct parameters
-    params = ['token', 'team_id']
+    params = ['token', 'team_id', 'amount']
     validate_request(params, data)
 
     token = data['token']
     team_id = data['team_id']
-    amount = float(data['amount'])
+    try:
+        amount = float(data['amount'])
+    except Exception:
+        raise errors.RequestError("Please enter a number")
+
     session_team_id = validate_session(token)
     if session_team_id != 1337:
         raise errors.RequestError("Not white team")
 
     user = Team.query.filter_by(uuid=team_id).first()
+    if user is None:
+        raise errors.TeamError("Team {} doesn't exist".format(team_id), status_code=404)
+
     user.balance = amount
     DB.session.commit()
+    logger.info("White Team set %d credtis for Team %d", amount, user.uuid)
 
     result['success'] = "Successfully set credits"
     return jsonify(result)
@@ -239,7 +265,6 @@ def buy():
 
     # create our tranasction
     # dst = 1337 because 1337 is white team
-    print enemy_id
     if enemy_id is not None:
         description = "{} bought {} from shop against Team {}".format(user.username, item.name, enemy_id)
 
@@ -327,8 +352,6 @@ def transfers():
     if dst_user is None:
         raise errors.TeamError("Team id not found", status_code=404)
 
-    print amount
-    print user.balance
     if user.balance < amount:
         raise errors.TransactionError('Insufficient funds')
 
